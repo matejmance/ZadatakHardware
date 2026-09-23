@@ -8,4 +8,8 @@ import java.util.List;
 public interface HardwareService {
     List<HardwareDTO> getAllHardware();
     List<HardwareDTO> getHardwareByCode(String code);
+
+    void saveHardware(HardwareDTO hardwareDTO);
+    void updateHardware(String code, HardwareDTO hardwareDTO);
+    void deleteHardware(String code);
 }

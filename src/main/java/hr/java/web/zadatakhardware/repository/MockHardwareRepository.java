@@ -60,4 +60,28 @@ public class MockHardwareRepository implements HardwareRepository {
     public List<Hardware> getHardwareByCode(String code) {
         return hardwareList.stream().filter(hardware -> hardware.getCode().equalsIgnoreCase(code)).toList();
     }
+
+    @Override
+    public void saveHardware(Hardware hardware) {
+        hardwareList.add(hardware);
+    }
+
+    @Override
+    public void updateHardware(String code, Hardware hardware) {
+        hardwareList.stream()
+                .filter(existingHardware -> existingHardware.getCode().equalsIgnoreCase(code))
+                .findFirst()
+                .ifPresent(existingHardware -> {
+                    existingHardware.setName(hardware.getName());
+                    existingHardware.setCode(hardware.getCode());
+                    existingHardware.setPrice(hardware.getPrice());
+                    existingHardware.setType(hardware.getType());
+                    existingHardware.setStock(hardware.getStock());
+                });
+
+    }
+    @Override
+    public void deleteHardware(String code) {
+        hardwareList.removeIf(hardware -> hardware.getCode().equalsIgnoreCase(code));
+    }
 }

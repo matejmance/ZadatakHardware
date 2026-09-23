@@ -1,6 +1,7 @@
 package hr.java.web.zadatakhardware.service;
 
 import hr.java.web.zadatakhardware.domain.Hardware;
+import hr.java.web.zadatakhardware.domain.HardwareType;
 import hr.java.web.zadatakhardware.dto.HardwareDTO;
 import hr.java.web.zadatakhardware.repository.HardwareRepository;
 import lombok.AllArgsConstructor;
@@ -28,6 +29,8 @@ public class HardwareServiceImpl implements HardwareService {
                 .map(this::convertHardwareToHardwareDTO)
                 .toList();
     }
+
+
     private HardwareDTO convertHardwareToHardwareDTO(Hardware hardware) {
         return new HardwareDTO(
                 hardware.getName(),
@@ -37,4 +40,30 @@ public class HardwareServiceImpl implements HardwareService {
                 hardware.getStock()
         );
     }
+    @Override
+    public void saveHardware(HardwareDTO hardwareDTO) {
+        Hardware hardware = convertHardwareDTOToHardware(hardwareDTO);
+        hardwareRepository.saveHardware(hardware);
+    }
+
+    @Override
+    public void updateHardware(String code, HardwareDTO hardwareDTO) {
+        Hardware hardware = convertHardwareDTOToHardware(hardwareDTO);
+        hardwareRepository.updateHardware(code, hardware);
+    }
+
+    private Hardware convertHardwareDTOToHardware(HardwareDTO hardwareDTO) {
+        return new Hardware(
+                hardwareDTO.getName(),
+                hardwareDTO.getCode(),
+                hardwareDTO.getPrice(),
+                HardwareType.valueOf(hardwareDTO.getType().toUpperCase()),
+                hardwareDTO.getStock()
+        );
+    }
+    @Override
+    public void deleteHardware(String code) {
+        hardwareRepository.deleteHardware(code);
+    }
+
 }
