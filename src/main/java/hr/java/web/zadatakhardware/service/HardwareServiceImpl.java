@@ -54,6 +54,7 @@ public class HardwareServiceImpl implements HardwareService {
 
     private Hardware convertHardwareDTOToHardware(HardwareDTO hardwareDTO) {
         return new Hardware(
+                null,
                 hardwareDTO.getName(),
                 hardwareDTO.getCode(),
                 hardwareDTO.getPrice(),

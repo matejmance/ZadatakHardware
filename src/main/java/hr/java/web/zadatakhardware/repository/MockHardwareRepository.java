@@ -16,6 +16,7 @@ public class MockHardwareRepository implements HardwareRepository {
     static {
         hardwareList = new ArrayList<>();
         Hardware firstHardware = new Hardware(
+                1L,
                 "intel NUC",
                 "1111",
                 new BigDecimal("240"),
@@ -23,6 +24,7 @@ public class MockHardwareRepository implements HardwareRepository {
                 1
         );
         Hardware secondHardware = new Hardware(
+                2L,
                 "AMD Ryzen 7 7800X3D",
                 "2222",
                 new BigDecimal("380"),
@@ -31,6 +33,7 @@ public class MockHardwareRepository implements HardwareRepository {
         );
 
         Hardware thirdHardware = new Hardware(
+                3L,
                 "NVIDIA GeForce RTX 5070",
                 "3333",
                 new BigDecimal("650"),
@@ -39,6 +42,7 @@ public class MockHardwareRepository implements HardwareRepository {
         );
 
         Hardware fourthHardware = new Hardware(
+                4L,
                 "Kingston Fury 32GB DDR5",
                 "4444",
                 new BigDecimal("120"),
