@@ -21,24 +21,32 @@ public class JdbcHardwareRepository implements HardwareRepository {
 
     @Override
     public List<Hardware> getAllHardware() {
-        return jdbcTemplate.query("SELECT*FROM Hardware",new HardwareMapper());
+        String sql = "SELECT Hardware.* , Type.name AS type FROM Hardware JOIN Type ON Hardware.typeId = Type.id";
+        return jdbcTemplate.query(sql,new HardwareMapper());
     }
 
     @Override
     public List<Hardware> getHardwareByCode(String code) {
-        return jdbcTemplate.query("SELECT * FROM Hardware WHERE code=?",new HardwareMapper(),code);
+        String sql = """
+            SELECT Hardware.*, Type.name AS type FROM Hardware
+            JOIN Type ON Hardware.typeId = Type.id
+            WHERE Hardware.code = ?
+            """;
+        return jdbcTemplate.query(sql,new HardwareMapper(),code);
     }
 
     @Override
     public void saveHardware(Hardware hardware) {
-        String sql = "INSERT INTO Hardware(name,code,price,type,stock) VALUES(?,?,?,?,?)";
+        Integer typeId = jdbcTemplate.queryForObject("SELECT id FROM Type WHERE name=?",Integer.class,hardware.getType().name());
+
+        String sql = "INSERT INTO Hardware(name,code,price,typeId,stock) VALUES(?,?,?,?,?)";
 
         jdbcTemplate.update(
                 sql,
                 hardware.getName(),
                 hardware.getCode(),
                 hardware.getPrice(),
-                hardware.getType().name(),
+                typeId,
                 hardware.getStock()
         );
 
@@ -48,9 +56,11 @@ public class JdbcHardwareRepository implements HardwareRepository {
 
     @Override
     public void updateHardware(String code, Hardware hardware) {
+        Integer typeId = jdbcTemplate.queryForObject("SELECT id FROM Type WHERE name=?",Integer.class,hardware.getType().name());
+
         String sql = """
             UPDATE Hardware
-            SET name = ?, code = ?, price = ?, type = ?, stock = ?
+            SET name = ?, code = ?, price = ?, typeId = ?, stock = ?
             WHERE code = ?
             """;
 
@@ -61,7 +71,7 @@ public class JdbcHardwareRepository implements HardwareRepository {
                 hardware.getName(),
                 hardware.getCode(),
                 hardware.getPrice(),
-                hardware.getType().name(),
+                typeId,
                 hardware.getStock(),
                 code
         );
