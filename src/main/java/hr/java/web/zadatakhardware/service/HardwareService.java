@@ -9,7 +9,7 @@ public interface HardwareService {
     List<HardwareDTO> getAllHardware();
     List<HardwareDTO> getHardwareByCode(String code);
 
-    void saveHardware(HardwareDTO hardwareDTO);
-    void updateHardware(String code, HardwareDTO hardwareDTO);
+    HardwareDTO saveHardware(HardwareDTO hardwareDTO);
+    HardwareDTO updateHardware(String code, HardwareDTO hardwareDTO);
     void deleteHardware(String code);
 }

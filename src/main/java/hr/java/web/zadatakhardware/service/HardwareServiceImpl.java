@@ -11,8 +11,11 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import static org.springframework.boot.jdbc.DataSourceBuilder.findType;
+import org.springframework.data.domain.Sort;
 
 @Service
 @AllArgsConstructor
@@ -24,7 +27,7 @@ public class HardwareServiceImpl implements HardwareService {
 
     @Override
     public List<HardwareDTO> getAllHardware() {
-        return hardwareRepository.findAll()
+        return hardwareRepository.findAll(Sort.by("id"))
                 .stream()
                 .map(this::convertHardwareToHardwareDTO)
                 .toList();
@@ -49,25 +52,39 @@ public class HardwareServiceImpl implements HardwareService {
         );
     }
     @Override
-    public void saveHardware(HardwareDTO hardwareDTO) {
+    public HardwareDTO saveHardware(HardwareDTO hardwareDTO) {
+        if (!hardwareRepository.findByCode(hardwareDTO.getCode()).isEmpty()) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Hardver s tim kodom već postoji"
+            );
+        }
+
         Hardware hardware = convertHardwareDTOToHardware(hardwareDTO);
-        hardwareRepository.save(hardware);
+        Hardware savedHardware = hardwareRepository.save(hardware);
+
+        return convertHardwareToHardwareDTO(savedHardware);
     }
 
     @Override
-    public void updateHardware(String code, HardwareDTO hardwareDTO) {
-        hardwareRepository.findByCode(code)
+    public HardwareDTO updateHardware(String code, HardwareDTO hardwareDTO) {
+        Hardware existingHardware = hardwareRepository.findByCode(code)
                 .stream()
                 .findFirst()
-                .ifPresent(existingHardware -> {
-                    existingHardware.setName(hardwareDTO.getName());
-                    existingHardware.setCode(hardwareDTO.getCode());
-                    existingHardware.setPrice(hardwareDTO.getPrice());
-                    existingHardware.setType(findType(hardwareDTO.getType()));
-                    existingHardware.setStock(hardwareDTO.getStock());
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Hardver s kodom " + code + " nije pronađen"
+                ));
 
-                    hardwareRepository.save(existingHardware);
-                });
+        existingHardware.setName(hardwareDTO.getName());
+        existingHardware.setCode(hardwareDTO.getCode());
+        existingHardware.setPrice(hardwareDTO.getPrice());
+        existingHardware.setType(findType(hardwareDTO.getType()));
+        existingHardware.setStock(hardwareDTO.getStock());
+
+        Hardware updatedHardware = hardwareRepository.save(existingHardware);
+
+        return convertHardwareToHardwareDTO(updatedHardware);
     }
 
     private Hardware convertHardwareDTOToHardware(HardwareDTO hardwareDTO) {
